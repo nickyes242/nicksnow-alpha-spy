@@ -30,23 +30,36 @@ app.post("/webhook", async (req, res) => {
 
             for (const transfer of tx.tokenTransfers) {
 
-                if (transfer.toUserAccount === WALLET) {
+ const tokenName =
+    transfer.tokenSymbol || "Unknown";
 
-                    const tokenName =
-                        transfer.tokenSymbol || "Unknown";
+const ca = transfer.mint;
 
-                    const ca = transfer.mint;
+// BUY
+if (transfer.toUserAccount === WALLET) {
 
-                    const embed = new EmbedBuilder()
-                        .setColor("Purple")
-                        .setTitle("🕵️ Wallet Buy Detected")
-                        .setDescription(
-                            `Wallet bought: **$${tokenName}**\nCA: \`${ca}\``
-                        );
+    const embed = new EmbedBuilder()
+        .setColor("Green")
+        .setTitle("🕵️ Wallet Buy Detected")
+        .setDescription(
+            `Wallet bought: **$${tokenName}**\nCA: \`${ca}\``
+        );
 
-                    channel.send({ embeds: [embed] });
-                }
-            }
+    channel.send({ embeds: [embed] });
+}
+
+// SELL
+if (transfer.fromUserAccount === WALLET) {
+
+    const embed = new EmbedBuilder()
+        .setColor("Red")
+        .setTitle("🕵️ Wallet Sell Detected")
+        .setDescription(
+            `Sold token: **${tokenName}**`
+        );
+
+    channel.send({ embeds: [embed] });
+}
         }
 
         res.sendStatus(200);
